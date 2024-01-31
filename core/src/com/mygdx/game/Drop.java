@@ -5,8 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -27,6 +29,10 @@ public class Drop extends ApplicationAdapter {
     private long lastDropTime;
     private Sound dropSound;
     private Music rainMusic;
+    float tamanio_fuente_puntuacion = 3.0F;
+    private BitmapFont contador_puntos;
+    int puntos=0;
+    private int altura;
 
 
     @Override
@@ -57,6 +63,12 @@ public class Drop extends ApplicationAdapter {
         rainMusic.setLooping(true);
         rainMusic.play();
 
+        this.altura = Gdx.graphics.getHeight();
+
+        //vamos a crear el contador con estas variables
+        contador_puntos = new BitmapFont();
+        contador_puntos.setColor(Color.WHITE);
+        contador_puntos.getData().setScale(tamanio_fuente_puntuacion);
         // ... more to come ...
     }
 
@@ -68,6 +80,7 @@ public class Drop extends ApplicationAdapter {
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+        contador_puntos.draw(batch, String.valueOf(puntos), 50, 450);
         batch.draw(bucketImage, bucket.x, bucket.y);
         for(Rectangle raindrop: raindrops) {
             batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -121,6 +134,7 @@ public class Drop extends ApplicationAdapter {
         bucketImage.dispose();
         dropSound.dispose();
         rainMusic.dispose();
+        contador_puntos.dispose();
         batch.dispose();
     }
 
