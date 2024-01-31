@@ -29,9 +29,11 @@ public class Drop extends ApplicationAdapter {
     private long lastDropTime;
     private Sound dropSound;
     private Music rainMusic;
-    float tamanio_fuente_puntuacion = 3.0F;
+    float tamanio_fuente_puntuacion = 2.0F;
     private BitmapFont contador_puntos;
+    private BitmapFont contador_vidas;
     int puntos=0;
+    int vidas=3;
     private int altura;
 
 
@@ -69,6 +71,10 @@ public class Drop extends ApplicationAdapter {
         contador_puntos = new BitmapFont();
         contador_puntos.setColor(Color.WHITE);
         contador_puntos.getData().setScale(tamanio_fuente_puntuacion);
+
+        contador_vidas = new BitmapFont();
+        contador_vidas.setColor(Color.GREEN);
+        contador_vidas.getData().setScale(tamanio_fuente_puntuacion);
         // ... more to come ...
     }
 
@@ -80,7 +86,8 @@ public class Drop extends ApplicationAdapter {
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        contador_puntos.draw(batch, String.valueOf(puntos), 50, 450);
+        contador_puntos.draw(batch, "Puntos: "+String.valueOf(puntos), 25, 450);
+        contador_vidas.draw(batch, "Vidas: "+String.valueOf(vidas), 675, 450);
         batch.draw(bucketImage, bucket.x, bucket.y);
         for(Rectangle raindrop: raindrops) {
             batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -108,10 +115,51 @@ public class Drop extends ApplicationAdapter {
         for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) {
             Rectangle raindrop = iter.next();
             raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-            if(raindrop.y + 64 < 0) iter.remove();
+            if(raindrop.y + 64 < 0){
+                vidas=vidas-1;
+                iter.remove();
+            }
 
             //sonido al coger la gota
             if(raindrop.overlaps(bucket)) {
+
+                if((puntos == 8))
+                {
+                    vidas = vidas + 1;
+                    //nivel = nivel + 1;
+                    //velocidad_enemigo = 500.0f;
+                    //velocidad_vida = 300.0f;
+
+
+                }else if((puntos == 18))
+                {
+                    vidas = vidas + 1;
+                    //nivel = nivel + 1;
+                    //velocidad_enemigo = 800.0f;
+                    //velocidad_vida = 400.0f;
+                }else if((puntos == 28))
+                {
+                    vidas = vidas + 1;
+                    //nivel = nivel + 1;
+                    //velocidad_enemigo = 1000.0f;
+                    //velocidad_vida = 500.0f;
+                }else if((puntos == 38))
+                {
+                    vidas = vidas + 1;
+   /*nivel = nivel + 1;
+   velocidad_enemigo = 1200.0f;
+   velocidad_vida = 600.0f;*/
+                }else if((puntos == 48))
+                {
+                    vidas = vidas + 1;
+   /*nivel = nivel + 1;
+   velocidad_enemigo = 1400.0f;
+   velocidad_vida = 700.0f;*/
+                }
+                puntos = puntos + 2;
+//coger_vida.play();
+                //rectangulo_vida.x = 1280;
+                //rectangulo_vida.y = MathUtils.random(0,800);
                 dropSound.play();
                 iter.remove();
             }
