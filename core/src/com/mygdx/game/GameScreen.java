@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
@@ -98,7 +99,7 @@ public class GameScreen implements Screen {
 
         game.batch.end();
 
-
+        /*
         if(Gdx.input.isTouched()) {
             Vector3 touchPos = new Vector3();
             touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -110,7 +111,39 @@ public class GameScreen implements Screen {
             bucket.x -= 200 * Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Keys.RIGHT))
             bucket.x += 200 * Gdx.graphics.getDeltaTime();
+        */
 
+        //boolean gyroscopeAvail = Gdx.input.isPeripheralAvailable(Input.Peripheral.Gyroscope);
+        boolean available = Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
+
+        int orientation = Gdx.input.getRotation();
+        Input.Orientation nativeOrientation = Gdx.input.getNativeOrientation();
+
+        if (available) {
+            float accelX = Gdx.input.getAccelerometerX();
+            float accelY = Gdx.input.getAccelerometerY();
+            //float accelZ = Gdx.input.getAccelerometerZ();
+
+            float movementSpeed = 300f; // Puedes ajustar este valor según la velocidad que desees
+            float deltaX = +accelY * Gdx.graphics.getDeltaTime() * movementSpeed;
+
+            bucket.x += deltaX;
+
+        }
+
+        /*
+        if (gyroscopeAvail) {
+            float gyroX = Gdx.input.getGyroscopeX();
+            // Ajusta la velocidad del movimiento según el valor del giroscopio
+            float movementSpeed = 500f; // Puedes ajustar este valor según la velocidad que desees
+
+            // Calcula el cambio de posición basado en el valor del giroscopio
+            float deltaX = +gyroX * Gdx.graphics.getDeltaTime() * movementSpeed;
+
+            // Actualiza la posición del cubo (bucket)
+            bucket.x += deltaX;
+        }
+        */
 
         if(bucket.x < 0) bucket.x = 0;
         //LIMITE DEL CUBO CON LA PANTALLA
