@@ -115,12 +115,12 @@ public class Drop extends ApplicationAdapter {
         updateRaindrops(raindrops2, dropSound2);
 
 
-        mezclaPrueba();
-        mezclaPrueba2();
+        gotasAzules();
+        gotasVerdesMoradas();
         spawnCorazon();
     }
 
-    private void mezclaPrueba() {
+    private void gotasAzules() {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         contador_puntos.draw(batch, "Puntos: "+String.valueOf(puntos), 25, 450);
@@ -204,7 +204,7 @@ public class Drop extends ApplicationAdapter {
         }
     }
 
-    private void mezclaPrueba2() {
+    private void gotasVerdesMoradas() {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         contador_puntos.draw(batch, "Puntos: "+String.valueOf(puntos), 25, 450);
@@ -326,49 +326,9 @@ public class Drop extends ApplicationAdapter {
                 iter.remove();
             }
 
-            //sonido al coger la gota
-            if(cora.overlaps(bucket)) {
+            vidas = vidas + 1; //el corazon da +1 vida
 
-                vidas = vidas + 1; //el corazon da +1 vida
-
-                if((puntos == 8))
-                {
-                    vidas = vidas + 1;
-                    //nivel = nivel + 1;
-                    //velocidad_enemigo = 500.0f;
-                    //velocidad_vida = 300.0f;
-
-
-                }else if((puntos == 18))
-                {
-                    vidas = vidas + 1;
-                    //nivel = nivel + 1;
-                    //velocidad_enemigo = 800.0f;
-                    //velocidad_vida = 400.0f;
-                }else if((puntos == 28))
-                {
-                    vidas = vidas + 1;
-                    //nivel = nivel + 1;
-                    //velocidad_enemigo = 1000.0f;
-                    //velocidad_vida = 500.0f;
-                }else if((puntos == 38))
-                {
-                    vidas = vidas + 1;
-   /*nivel = nivel + 1;
-   velocidad_enemigo = 1200.0f;
-   velocidad_vida = 600.0f;*/
-                }else if((puntos == 48))
-                {
-                    vidas = vidas + 1;
-   /*nivel = nivel + 1;
-   velocidad_enemigo = 1400.0f;
-   velocidad_vida = 700.0f;*/
-                }
-//coger_vida.play();
-                //rectangulo_vida.x = 1280;
-                //rectangulo_vida.y = MathUtils.random(0,800);
-                iter.remove();
-            }
+            iter.remove();
         }
     }
 
@@ -413,26 +373,6 @@ public class Drop extends ApplicationAdapter {
             }
         }
     }
-    private void drawGameObjects() {
-        batch.begin();
-        batch.draw(bucketImage, bucket.x, bucket.y);
-
-
-        for (Rectangle raindrop : raindrops) {
-            batch.draw(dropImage, raindrop.x, raindrop.y);
-        }
-
-
-        for (Rectangle raindrop : raindrops2) {
-            batch.draw(dropImage2, raindrop.x, raindrop.y);
-        }
-
-        for (Rectangle raindrop : raindrops2) {
-            batch.draw(dropImage2, raindrop.x, raindrop.y);
-        }
-
-        batch.end();
-    }
 
     private void spawnRaindrop() {
         Rectangle raindrop = new Rectangle();
@@ -453,7 +393,6 @@ public class Drop extends ApplicationAdapter {
 
         lastDropTime = TimeUtils.nanoTime();
     }
-
 
 
     @Override
