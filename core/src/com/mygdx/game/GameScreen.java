@@ -27,14 +27,29 @@ public class GameScreen implements Screen {
     final Drop game;
 
     private Texture dropImage;
+    private Texture dropImage2;
+    private Texture corazonImage;
     private Texture bucketImage;
     private OrthographicCamera camera;
     private Rectangle bucket;
     private Array<Rectangle> raindrops;
+    private Array<Rectangle> raindrops2;
     private Array<Rectangle> corazones;
-    private long lastDropTime;
     private Sound dropSound;
+    private Sound dropSound2;
     private Music rainMusic;
+
+    // controlar el tiempo de spawn de los corazones
+    private long lastCorazonTime;
+    private long corazonSpawnInterval = 3500000000L; // Cambia este valor según la frecuencia deseada (en nanosegundos)
+
+    // Controlar el tiempo de spawn de las gotas1
+    private long lastDropTime;
+    private long dropSpawnInterval = 900000000L; // Cambia este valor según la frecuencia deseada (en nanosegundos)
+
+    // Controlar el tiempo de spawn de las gotas2
+    private long lastDropTime2;
+    private long dropSpawnInterval2 = 700000000L; // Cambia este valor según la frecuencia deseada (en nanosegundos)
 
     int puntos=0;
     int vidas=3;
@@ -47,6 +62,8 @@ public class GameScreen implements Screen {
 
         // load the images for the droplet and the bucket, 64x64 pixels each
         dropImage = new Texture(Gdx.files.internal("drop.png"));
+        dropImage2 = new Texture(Gdx.files.internal("drop2.png"));
+        corazonImage = new Texture(Gdx.files.internal("corazon.png"));
         bucketImage = new Texture(Gdx.files.internal("bucket.png"));
 
         camera = new OrthographicCamera();
@@ -59,20 +76,24 @@ public class GameScreen implements Screen {
         bucket.height = 64;
 
         raindrops = new Array<Rectangle>();
-        spawnRaindrop();
+        //creo los arrays para las nuevs gotas
+        raindrops2 = new Array<Rectangle>();
+        corazones = new Array<Rectangle>();
 
-
+        spawnRaindrop(); //creamos la gota
+        spawnRaindrop2(); //creamos la gota2
+        spawnCorazon(); //creamos el corazon
 
 
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+        dropSound2 = Gdx.audio.newSound(Gdx.files.internal("drop2.wav"));
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
         rainMusic.setLooping(true); // start the playback of the background music immediately
 
         //this.altura = Gdx.graphics.getHeight();
 
         // fondo del juego
-
         fondo = new Texture(Gdx.files.internal("lluviatriste.jpg"));
 
     }
@@ -95,6 +116,16 @@ public class GameScreen implements Screen {
 
         for(Rectangle raindrop: raindrops) {
             game.batch.draw(dropImage, raindrop.x, raindrop.y);
+        }
+
+        //bucle para las gotas 2
+        for(Rectangle raindrop: raindrops2) {
+            game.batch.draw(dropImage2, raindrop.x, raindrop.y);
+        }
+
+        // bucle para el corazon
+        for(Rectangle raindrop: corazones) {
+            game.batch.draw(corazonImage, raindrop.x, raindrop.y);
         }
 
         game.batch.end();
@@ -151,14 +182,20 @@ public class GameScreen implements Screen {
 
         // comprobamos si necesitamos crear mas gotas
         if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+        if(TimeUtils.nanoTime() - lastDropTime2 > 1000000000) spawnRaindrop2();
+        if (TimeUtils.nanoTime() - lastCorazonTime > 900000000) spawnCorazon();
 
+
+
+
+        //GOTAS 1
         // quitamos las gotas que estan mas alla del limite de la pantalla o que han chocado con el cubo
         Iterator<Rectangle> iter = raindrops.iterator();
         while (iter.hasNext()) {
             Rectangle raindrop = iter.next();
             raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
             if(raindrop.y + 64 < 0){
-                vidas=vidas-1;
+                //vidas=vidas-1;
                 iter.remove();
             }
 
@@ -176,17 +213,103 @@ public class GameScreen implements Screen {
                 game.setScreen(new GameOverScreen( game));
 
             }
+        }//fin while
+
+        // GOTAS 2
+        Iterator<Rectangle> iter2 = raindrops2.iterator();
+        while (iter2.hasNext()) {
+            Rectangle raindrop2 = iter2.next();
+            raindrop2.y -= 200 * Gdx.graphics.getDeltaTime();
+            if(raindrop2.y + 64 < 0){
+                //puntos = puntos-1;
+                iter2.remove();
+            }
+
+            //sonido al coger la gota
+            if(raindrop2.overlaps(bucket)) {
+                vidas = vidas -1;
+                dropSound2.play();
+
+                iter2.remove();
+            }// fin del if del buckect
+
+            if (vidas <=0){
+
+                dispose();
+                game.setScreen(new GameOverScreen( game));
+
+            }
+        }//fin while
+
+        //CORAZONES
+        Iterator<Rectangle> iter3 = corazones.iterator();
+        while (iter3.hasNext()) {
+            Rectangle corazon = iter3.next(); // Cambiado 'raindrop' por 'corazon'
+            corazon.y -= 200 * Gdx.graphics.getDeltaTime(); // Cambiado 'raindrop' por 'corazon'
+            if(corazon.y + 64 < 0){ // Cambiado 'raindrop' por 'corazon'
+                //vidas=vidas-1;
+                iter3.remove();
+            }
+
+            //sonido al coger el corazón
+            if(corazon.overlaps(bucket)) { // Cambiado 'raindrop' por 'corazon'
+                vidas++;
+                dropSound.play();
+
+                iter3.remove();
+            }// fin del if del corazón
+
+            if (vidas <=0){
+                dispose();
+                game.setScreen(new GameOverScreen( game));
+            }
+        }//fin while
+
+
+    }//fin render
+
+    private void spawnRaindrop2() {
+        if (TimeUtils.nanoTime() - lastDropTime2 > dropSpawnInterval2) {
+            Rectangle raindrop2 = new Rectangle();
+            raindrop2.x = MathUtils.random(0, 800-64);
+            raindrop2.y = 480;
+            raindrop2.width = 64;
+            raindrop2.height = 64;
+            raindrops2.add(raindrop2);
+            lastDropTime2 = TimeUtils.nanoTime();
         }
     }
 
     private void spawnRaindrop() {
-        Rectangle raindrop = new Rectangle();
-        raindrop.x = MathUtils.random(0, 800-64);
-        raindrop.y = 480;
-        raindrop.width = 64;
-        raindrop.height = 64;
-        raindrops.add(raindrop);
-        lastDropTime = TimeUtils.nanoTime();
+        // Crear gota1 solo si ha pasado suficiente tiempo desde la última generación
+        if (TimeUtils.nanoTime() - lastDropTime > dropSpawnInterval) {
+            // Crear gota
+            Rectangle raindrop = new Rectangle();
+            raindrop.x = MathUtils.random(0, 800-64);
+            raindrop.y = 480;
+            raindrop.width = 64;
+            raindrop.height = 64;
+            raindrops.add(raindrop);
+
+            // Actualizar el tiempo de la última generación de gota
+            lastDropTime = TimeUtils.nanoTime();
+        }
+    }
+
+    private void spawnCorazon() {
+        // Crear corazón solo si ha pasado suficiente tiempo desde la última generación
+        if (TimeUtils.nanoTime() - lastCorazonTime > corazonSpawnInterval) {
+            // Crear corazón
+            Rectangle corazon = new Rectangle();
+            corazon.x = MathUtils.random(0, 800-64);
+            corazon.y = 480;
+            corazon.width = 64;
+            corazon.height = 64;
+            corazones.add(corazon);
+
+            // Actualizar el tiempo de la última generación de corazón
+            lastCorazonTime = TimeUtils.nanoTime();
+        }
     }
 
 
@@ -217,8 +340,11 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         dropImage.dispose();
+        dropImage2.dispose();
+        corazonImage.dispose();
         bucketImage.dispose();
         dropSound.dispose();
+        dropSound2.dispose();
         rainMusic.dispose();
         //game.batch.dispose();
     }
